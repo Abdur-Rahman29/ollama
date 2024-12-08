@@ -17,16 +17,23 @@ stages:
       vmImage: ubuntu-latest
     steps:
     - task: Docker@2
-      displayName: Build an image
+      displayName: Build Docker image
       inputs:
         command: build
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
         tags: |
           $(tag)
 
+    - task: CopyFiles@2
+      displayName: Copy build files to staging directory
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)'  # Folder with your build files
+        Contents: '**/*'                          # Copy all files and folders
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'  # Folder to copy files to
+
     - task: PublishBuildArtifacts@1
       displayName: Publish build artifacts
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'  # Publish the files from artifact staging directory
         ArtifactName: 'drop'
         publishLocation: 'Container'
